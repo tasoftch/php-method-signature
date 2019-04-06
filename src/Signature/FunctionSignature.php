@@ -27,7 +27,7 @@ namespace TASoft\PHP\Signature;
 use TASoft\PHP\Attribute\ArgumentValue;
 use TASoft\PHP\Attribute\ReturnValue;
 
-class FunctionSignature implements \Serializable, \ArrayAccess, \Countable
+class FunctionSignature implements \Serializable, \ArrayAccess, \Countable, \IteratorAggregate
 {
     /**
      * @var string
@@ -43,6 +43,12 @@ class FunctionSignature implements \Serializable, \ArrayAccess, \Countable
 
     /** @var null|ReturnValue */
     private $returnValue;
+
+    public function getIterator()
+    {
+        return new \ArrayIterator($this->arguments);
+    }
+
 
     /**
      * FunctionSignature constructor.
