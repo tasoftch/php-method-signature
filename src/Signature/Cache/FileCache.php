@@ -24,54 +24,8 @@
 namespace TASoft\PHP\Signature\Cache;
 
 
-use TASoft\PHP\Signature\ClosureSignature;
-use TASoft\PHP\Signature\FunctionSignature;
-use TASoft\PHP\Signature\MethodSignature;
-
-class FileCache extends AbstractDynamicMemoryCache
+class FileCache extends AbstractFileCache
 {
-    /** @var string */
-    private $filename;
-    private $fileContents;
-    /** @var bool */
-    private $readonly;
-
-    /**
-     * FileCache constructor.
-     * @param string $filename
-     */
-    public function __construct(string $filename, bool $readonly = false)
-    {
-        $this->filename = $filename;
-        $this->readonly = $readonly;
-    }
-
-    protected function loadMeta(): array
-    {
-        return $this->_getContents()["meta"] ?? [];
-    }
-
-    protected function storeMeta(array $meta)
-    {
-        $this->_getContents();
-        $this->fileContents["meta"] = $meta;
-    }
-
-    public function store()
-    {
-        parent::store();
-        $this->storeFileContent($this->fileContents);
-    }
-
-
-    /**
-     * @return string
-     */
-    public function getFilename(): string
-    {
-        return $this->filename;
-    }
-
     protected function loadFileContent(): array {
         if(file_exists($this->getFilename()))
             return require $this->getFilename();
@@ -82,61 +36,5 @@ class FileCache extends AbstractDynamicMemoryCache
         $content = var_export($content, true);
         file_put_contents($this->getFilename(), "<?php\nreturn $content;");
         $this->contentChanged = false;
-    }
-
-    private function _getContents() {
-        if($this->fileContents === NULL) {
-            $this->fileContents = $this->loadFileContent();
-        }
-        return $this->fileContents;
-    }
-
-    public function storeFunctionSiguature(FunctionSignature $signature, \ReflectionFunction $function)
-    {
-        parent::storeFunctionSiguature($signature, $function);
-        $this->_getContents();
-        $this->fileContents["functions"][$signature->getQualifiedName()] = serialize($signature);
-    }
-
-    public function storeMethodSignature(MethodSignature $signature, \ReflectionMethod $method)
-    {
-        parent::storeMethodSignature($signature, $method);
-        $this->_getContents();
-        $this->fileContents["methods"][sprintf("%s::%s", $signature->getClassName(), $signature->getQualifiedName())] = serialize($signature);
-    }
-
-    /**
-     * @return bool
-     */
-    public function isReadonly(): bool
-    {
-        return $this->readonly;
-    }
-
-
-    protected function loadFunctionSignature(string $functionName): ?FunctionSignature
-    {
-        if($data = $this->_getContents()["functions"][$functionName] ?? NULL) {
-            if(is_string($data)) {
-                return unserialize($data);
-            }
-        }
-        return NULL;
-    }
-
-    protected function loadMethodSignature(string $objectClass, string $methodName): ?MethodSignature
-    {
-        if($data = $this->_getContents()["methods"][sprintf("%s::%s", $objectClass, $methodName)] ?? NULL) {
-            if(is_string($data)) {
-                return unserialize($data);
-            }
-        }
-        return NULL;
-    }
-
-    protected function loadClosureSignature(\Closure $closure): ?ClosureSignature
-    {
-        // Closures are dynamically created and can not be stored.
-        return NULL;
     }
 }
