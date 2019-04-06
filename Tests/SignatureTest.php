@@ -164,5 +164,6 @@ class SignatureTest extends TestCase
 
     public static function options()
     {
+
     }
 }
