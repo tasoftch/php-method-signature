@@ -23,15 +23,25 @@
 
 namespace TASoft\PHP\Signature\Cache;
 
-
+/**
+ * Atomic file cache loader
+ *
+ * @package TASoft\PHP\Signature\Cache
+ */
 class FileCache extends AbstractFileCache
 {
+    /**
+     * @inheritDoc
+     */
     protected function loadFileContent(): array {
         if(file_exists($this->getFilename()))
             return require $this->getFilename();
         return [];
     }
 
+    /**
+     * @inheritDoc
+     */
     protected function storeFileContent(array $content) {
         $content = var_export($content, true);
         file_put_contents($this->getFilename(), "<?php\nreturn $content;");

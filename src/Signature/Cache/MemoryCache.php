@@ -28,16 +28,30 @@ use TASoft\PHP\Signature\ClosureSignature;
 use TASoft\PHP\Signature\FunctionSignature;
 use TASoft\PHP\Signature\MethodSignature;
 
+/**
+ * Default In Memory cache that creates not yet loaded signatures
+ *
+ * @package TASoft\PHP\Signature\Cache
+ */
 class MemoryCache extends AbstractMemoryCache
 {
+    /**
+     * @inheritDoc
+     */
     protected function loadFunctionSignature(string $functionName): ?FunctionSignature {
         return NULL;
     }
 
+    /**
+     * @inheritDoc
+     */
     protected function loadMethodSignature(string $objectClass, string $methodName): ?MethodSignature {
         return NULL;
     }
 
+    /**
+     * @inheritDoc
+     */
     protected function loadClosureSignature(\Closure $closure): ?ClosureSignature {
         return NULL;
     }

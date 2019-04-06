@@ -28,12 +28,20 @@ use TASoft\PHP\Signature\ClosureSignature;
 use TASoft\PHP\Signature\FunctionSignature;
 use TASoft\PHP\Signature\MethodSignature;
 
+/**
+ * Default implementation to keep loaded signatures in memory
+ *
+ * @package TASoft\PHP\Signature\Cache
+ */
 abstract class AbstractMemoryCache implements CacheInterface
 {
     protected $functions = [];
     protected $methods = [];
     protected $closures = [];
 
+    /**
+     * @inheritDoc
+     */
     public function getFunctionSignature(string $functionName): ?FunctionSignature
     {
         if(!isset($this->functions[$functionName])) {
@@ -42,6 +50,9 @@ abstract class AbstractMemoryCache implements CacheInterface
         return $this->functions[$functionName] ?: NULL;
     }
 
+    /**
+     * @inheritDoc
+     */
     public function getMethodSignature(string $objectClass, string $methodName): ?MethodSignature
     {
         if(!isset($this->methods["$objectClass::$methodName"])) {
@@ -50,6 +61,9 @@ abstract class AbstractMemoryCache implements CacheInterface
         return $this->methods["$objectClass::$methodName"] ?: NULL;
     }
 
+    /**
+     * @inheritDoc
+     */
     public function getClosureSignature(\Closure $closure): ?ClosureSignature
     {
         $cn = spl_object_hash($closure);
@@ -59,27 +73,58 @@ abstract class AbstractMemoryCache implements CacheInterface
         return $this->closures[$cn] ?: NULL;
     }
 
+    /**
+     * If not in memory yet, this method is called to load from cache
+     *
+     * @param string $functionName
+     * @return FunctionSignature|null
+     */
     abstract protected function loadFunctionSignature(string $functionName): ?FunctionSignature;
 
+    /**
+     * If not in memory yet, this method is called to load from cache
+     *
+     * @param string $objectClass
+     * @param string $methodName
+     * @return MethodSignature|null
+     */
     abstract protected function loadMethodSignature(string $objectClass, string $methodName): ?MethodSignature;
 
+    /**
+     * If not in memory yet, this method is called to load from cache
+     *
+     * @param \Closure $closure
+     * @return ClosureSignature|null
+     */
     abstract protected function loadClosureSignature(\Closure $closure): ?ClosureSignature;
 
+    /**
+     * @inheritDoc
+     */
     public function storeFunctionSiguature(FunctionSignature $signature, \ReflectionFunction $function)
     {
         $this->functions[$signature->getQualifiedName()] = $signature;
     }
 
+    /**
+     * @inheritDoc
+     */
     public function storeMethodSignature(MethodSignature $signature, \ReflectionMethod $method)
     {
         $this->methods[sprintf("%s::%s", $signature->getClassName(), $signature->getQualifiedName())] = $signature;
     }
 
+    /**
+     * @inheritDoc
+     */
     public function storeClosureSignature(ClosureSignature $signature, \Closure $closure)
     {
         $this->closures[ spl_object_hash($closure) ] = $signature;
     }
 
+    /**
+     * Stores the cache
+     */
     public function store() {
     }
 }

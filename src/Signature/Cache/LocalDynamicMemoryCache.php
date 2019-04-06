@@ -28,10 +28,23 @@ use TASoft\PHP\Signature\ClosureSignature;
 use TASoft\PHP\Signature\FunctionSignature;
 use TASoft\PHP\Signature\MethodSignature;
 
+/**
+ * Local memory cache that allows modification checks as well.
+ *
+ * @package TASoft\PHP\Signature\Cache
+ */
 class LocalDynamicMemoryCache extends AbstractDynamicMemoryCache
 {
     private $metadata;
 
+    /**
+     * Pass all signatures you want to capture
+     *
+     * @param $metadata
+     * @param null $functions
+     * @param null $methods
+     * @param null $closures
+     */
     public function __construct(&$metadata, &$functions = NULL, &$methods = NULL, &$closures = NULL)
     {
         if(!is_array($metadata))
@@ -43,38 +56,59 @@ class LocalDynamicMemoryCache extends AbstractDynamicMemoryCache
         $this->metadata = &$metadata;
     }
 
+    /**
+     * @inheritDoc
+     */
     protected function &loadMeta(): array
     {
         $a =& $this->metadata;
         return $a;
     }
 
+    /**
+     * @inheritDoc
+     */
     protected function storeMeta(array $meta)
     {
         $this->metadata = $meta;
     }
 
+    /**
+     * @inheritDoc
+     */
     protected function loadFunctionSignature(string $functionName): ?FunctionSignature
     {
         return NULL;
     }
 
+    /**
+     * @inheritDoc
+     */
     protected function loadMethodSignature(string $objectClass, string $methodName): ?MethodSignature
     {
         return NULL;
     }
 
+    /**
+     * @inheritDoc
+     */
     protected function loadClosureSignature(\Closure $closure): ?ClosureSignature
     {
         return NULL;
     }
 
+    /**
+     * @inheritDoc
+     */
     public function storeFunctionSiguature(FunctionSignature $signature, \ReflectionFunction $function)
     {
         parent::storeFunctionSiguature($signature, $function);
         parent::store();
     }
 
+    /**
+     * @inheritDoc
+     */
     public function storeMethodSignature(MethodSignature $signature, \ReflectionMethod $method)
     {
         parent::storeMethodSignature($signature, $method);

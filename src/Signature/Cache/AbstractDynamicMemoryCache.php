@@ -35,12 +35,29 @@ use TASoft\PHP\Signature\MethodSignature;
  */
 abstract class AbstractDynamicMemoryCache extends AbstractMemoryCache
 {
+    /** @var array Metadata is used to mark modification dates on files. */
     private $meta = [];
     private $markToStore = true;
 
+    /**
+     * Load the metadata
+     * @return array
+     */
     abstract protected function loadMeta(): array;
+
+    /**
+     * Stores the metadata
+     *
+     * @param array $meta
+     * @return void
+     */
     abstract protected function storeMeta(array $meta);
 
+    /**
+     * Load and/or get metadata
+     * @return array
+     * @internal
+     */
     private function _getMeta(): array {
         if(!$this->meta) {
             $this->meta = $this->loadMeta();
@@ -48,7 +65,12 @@ abstract class AbstractDynamicMemoryCache extends AbstractMemoryCache
         return $this->meta;
     }
 
-
+    /**
+     * Returns true, if the file declaring the requested function was changed since last cache store of this function.
+     *
+     * @param string $functionName
+     * @return bool
+     */
     protected function functionDidChange(string $functionName): bool {
         if($f = $this->_getMeta()["f"][$functionName] ?? NULL) {
             list($file, $mod) = $f;
@@ -57,6 +79,13 @@ abstract class AbstractDynamicMemoryCache extends AbstractMemoryCache
         return true;
     }
 
+    /**
+     * Returns true, if the file declaring the requested method was changed since last cache store of this method.
+     *
+     * @param string $objectClass
+     * @param string $methodName
+     * @return bool
+     */
     protected function methodDidChange(string $objectClass, string $methodName): bool {
         if($f = $this->_getMeta()["f"]["$objectClass::$methodName"] ?? NULL) {
             list($file, $mod) = $f;
@@ -65,7 +94,9 @@ abstract class AbstractDynamicMemoryCache extends AbstractMemoryCache
         return true;
     }
 
-
+    /**
+     * @inheritDoc
+     */
     public function storeFunctionSiguature(FunctionSignature $signature, \ReflectionFunction $function)
     {
         parent::storeFunctionSiguature($signature, $function);
@@ -76,6 +107,9 @@ abstract class AbstractDynamicMemoryCache extends AbstractMemoryCache
         $this->markToStore = true;
     }
 
+    /**
+     * @inheritDoc
+     */
     public function storeMethodSignature(MethodSignature $signature, \ReflectionMethod $method)
     {
         parent::storeMethodSignature($signature, $method);
@@ -86,17 +120,27 @@ abstract class AbstractDynamicMemoryCache extends AbstractMemoryCache
         $this->markToStore = true;
     }
 
+    /**
+     * Always return NULL if the file of declared function changed
+     * @inheritDoc
+     */
     public function getFunctionSignature(string $functionName): ?FunctionSignature
     {
         return $this->functionDidChange($functionName) ? NULL : parent::getFunctionSignature($functionName);
     }
 
+    /**
+     * Always return NULL if the file of declared method changed
+     * @inheritDoc
+     */
     public function getMethodSignature(string $objectClass, string $methodName): ?MethodSignature
     {
         return $this->methodDidChange($objectClass, $methodName) ? NULL : parent::loadMethodSignature($objectClass, $methodName);
     }
 
-
+    /**
+     * @inheritDoc
+     */
     public function store()
     {
         if($this->markToStore)

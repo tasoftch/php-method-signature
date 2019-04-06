@@ -23,9 +23,20 @@
 
 namespace TASoft\PHP\Signature\Cache;
 
-
+/**
+ * Local memory caches allow to cache signatures in local scope variables.
+ *
+ * @package TASoft\PHP\Signature\Cache
+ */
 class LocalMemoryCache extends MemoryCache
 {
+    /**
+     * Pass all signatures you want to capture
+     *
+     * @param null $functions
+     * @param null $methods
+     * @param null $closures
+     */
     public function __construct(&$functions = NULL, &$methods = NULL, &$closures = NULL)
     {
         $this->functions = &$functions;

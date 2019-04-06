@@ -28,6 +28,11 @@ use TASoft\PHP\Signature\ClosureSignature;
 use TASoft\PHP\Signature\FunctionSignature;
 use TASoft\PHP\Signature\MethodSignature;
 
+/**
+ * Default implementation to cache signatures into and from files
+ *
+ * @package TASoft\PHP\Signature
+ */
 abstract class AbstractFileCache extends AbstractDynamicMemoryCache
 {
     /** @var string */
@@ -62,19 +67,26 @@ abstract class AbstractFileCache extends AbstractDynamicMemoryCache
         return $this->readonly;
     }
 
-
-
+    /**
+     * @inheritDoc
+     */
     protected function loadMeta(): array
     {
         return $this->getFileContents()["meta"] ?? [];
     }
 
+    /**
+     * @inheritDoc
+     */
     protected function storeMeta(array $meta)
     {
         $this->getFileContents();
         $this->fileContents["meta"] = $meta;
     }
 
+    /**
+     * @inheritDoc
+     */
     public function store()
     {
         if($this->isReadonly() == false) {
@@ -83,6 +95,10 @@ abstract class AbstractFileCache extends AbstractDynamicMemoryCache
         }
     }
 
+    /**
+     * Returns the loaded file content
+     * @return array
+     */
     public function getFileContents() {
         if($this->fileContents === NULL) {
             $this->fileContents = $this->loadFileContent();
@@ -90,10 +106,22 @@ abstract class AbstractFileCache extends AbstractDynamicMemoryCache
         return $this->fileContents;
     }
 
+    /**
+     * Return the contents of the file
+     * @return array
+     */
     abstract protected function loadFileContent(): array;
 
+    /**
+     * Stores cache into file
+     * @param array $content
+     * @return mixed
+     */
     abstract protected function storeFileContent(array $content);
 
+    /**
+     * @inheritDoc
+     */
     protected function loadFunctionSignature(string $functionName): ?FunctionSignature
     {
         if($data = $this->getFileContents()["functions"][$functionName] ?? NULL) {
@@ -104,6 +132,9 @@ abstract class AbstractFileCache extends AbstractDynamicMemoryCache
         return NULL;
     }
 
+    /**
+     * @inheritDoc
+     */
     protected function loadMethodSignature(string $objectClass, string $methodName): ?MethodSignature
     {
         if($data = $this->getFileContents()["methods"][sprintf("%s::%s", $objectClass, $methodName)] ?? NULL) {
@@ -114,6 +145,9 @@ abstract class AbstractFileCache extends AbstractDynamicMemoryCache
         return NULL;
     }
 
+    /**
+     * @inheritDoc
+     */
     public function storeFunctionSiguature(FunctionSignature $signature, \ReflectionFunction $function)
     {
         parent::storeFunctionSiguature($signature, $function);
@@ -121,6 +155,9 @@ abstract class AbstractFileCache extends AbstractDynamicMemoryCache
         $this->fileContents["functions"][$signature->getQualifiedName()] = serialize($signature);
     }
 
+    /**
+     * @inheritDoc
+     */
     public function storeMethodSignature(MethodSignature $signature, \ReflectionMethod $method)
     {
         parent::storeMethodSignature($signature, $method);
@@ -128,7 +165,9 @@ abstract class AbstractFileCache extends AbstractDynamicMemoryCache
         $this->fileContents["methods"][sprintf("%s::%s", $signature->getClassName(), $signature->getQualifiedName())] = serialize($signature);
     }
 
-
+    /**
+     * @inheritDoc
+     */
     protected function loadClosureSignature(\Closure $closure): ?ClosureSignature
     {
         // Caching closures is not supported by this version of file caching
