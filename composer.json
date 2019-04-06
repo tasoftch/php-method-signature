@@ -1,0 +1,21 @@
+{
+  "name": "tasoft/method-signature",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Thomas Abplanalp",
+      "email": "info@tasoft.ch"
+    }
+  ],
+  "autoload": {
+    "psr-4": {
+      "TASoft\\PHP\\" : "src"
+    }
+  },
+  "require" : {
+    "php": "^7.2"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^7"
+  }
+}
