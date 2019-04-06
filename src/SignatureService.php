@@ -126,7 +126,26 @@ class SignatureService
      * @return FunctionSignature|null
      */
     public function getSignature($anything): ?FunctionSignature {
+        if (is_string($anything)) {
+            if (function_exists($anything))
+                return $this->getFunctionSignature($anything);
+            $anything = explode("::", $anything);
+            if (count($anything) == 2) {
+                return $this->getMethodSignature($anything[0], $anything[1]);
+            }
+        } elseif (is_array($anything)) {
+            if (count($anything) == 2) {
+                $class = $anything[0];
+                if (is_object($class))
+                    $class = get_class($class);
 
+                return $this->getMethodSignature($class, $anything[1]);
+            }
+        } elseif (is_callable($anything)) {
+            return $this->getClosureSignature($anything);
+        }
+
+        return NULL;
     }
 
     /**

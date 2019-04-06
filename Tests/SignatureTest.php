@@ -35,6 +35,7 @@ use TASoft\PHP\Signature\Cache\LocalDynamicMemoryCache;
 use TASoft\PHP\Signature\Cache\LocalMemoryCache;
 use TASoft\PHP\Signature\ClosureSignature;
 use TASoft\PHP\Signature\FunctionSignature;
+use TASoft\PHP\Signature\MethodSignature;
 use TASoft\PHP\SignatureService;
 
 
@@ -129,5 +130,40 @@ class SignatureTest extends TestCase
 
         $this->assertNotSame($sig1, $service->getFunctionSignature("myTestFunction"));
         $this->assertEquals($sig1, $service->getFunctionSignature("myTestFunction"));
+    }
+
+    public function testAnythingSignature()
+    {
+        $service = new SignatureService(new LocalMemoryCache($f, $m, $c));
+
+        // Functions
+        $sig = $service->getSignature("strlen");
+        $this->assertEquals(FunctionSignature::class, get_class($sig));
+        $this->assertEquals("strlen", $sig->getQualifiedName());
+
+        $sig = $service->getSignature("SignatureTest::options");
+        $this->assertEquals(MethodSignature::class, get_class($sig));
+        $this->assertEquals("options", $sig->getQualifiedName());
+        $this->assertEquals("SignatureTest", $sig->getClassName());
+
+        $sig = $service->getSignature(["SignatureTest", "options"]);
+        $this->assertEquals(MethodSignature::class, get_class($sig));
+        $this->assertEquals("options", $sig->getQualifiedName());
+        $this->assertEquals("SignatureTest", $sig->getClassName());
+
+        $sig = $service->getSignature([$this, "methodToTest"]);
+        $this->assertEquals(MethodSignature::class, get_class($sig));
+        $this->assertEquals("methodToTest", $sig->getQualifiedName());
+        $this->assertEquals("SignatureTest", $sig->getClassName());
+
+        $sig = $service->getSignature(function () {
+        });
+
+        $this->assertEquals(ClosureSignature::class, get_class($sig));
+    }
+
+    public static function options()
+    {
+
     }
 }
