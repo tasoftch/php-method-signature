@@ -165,4 +165,54 @@ class SignatureTest extends TestCase
     public static function options()
     {
     }
+
+    public function testClassNameSignature()
+    {
+        $service = new SignatureService();
+        $sig = $service->getSignature(MySpecialClass::class);
+
+        $this->assertEquals(MySpecialClass::class, $sig->getClassName());
+        $this->assertEquals("__construct", $sig->getQualifiedName());
+
+        $this->assertEquals("_123", $sig[0]);
+    }
+
+    public function testClassNameSignature2()
+    {
+        $service = new SignatureService();
+        $sig = $service->getSignature(MySpecialClassWithoutConstructor::class);
+
+        $this->assertEquals(MySpecialClassWithoutConstructor::class, $sig->getClassName());
+        $this->assertEquals("__construct", $sig->getQualifiedName());
+
+        $this->assertCount(0, $sig);
+    }
+
+    public function testInvokableSignature()
+    {
+        $service = new SignatureService();
+        $sig = $service->getSignature(new class
+        {
+            public function __invoke(MySpecialClass $specialClass, int $flags = NULL)
+            {
+            }
+        });
+
+        $this->assertEquals("__invoke", $sig->getQualifiedName());
+        $this->assertEquals('specialClass', $sig[0]);
+        $this->assertTrue($sig[1]->isOptional());
+        $this->assertTrue($sig['flags']->allowsNull());
+    }
+}
+
+class MySpecialClass
+{
+    public function __construct(int $_123, string $abc)
+    {
+    }
+}
+
+class MySpecialClassWithoutConstructor
+{
+
 }

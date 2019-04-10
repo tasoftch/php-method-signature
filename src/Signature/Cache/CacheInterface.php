@@ -30,12 +30,58 @@ use TASoft\PHP\Signature\MethodSignature;
 
 interface CacheInterface
 {
+    /**
+     * Gets the signature for $functionName from cache
+     *
+     * @param string $functionName
+     * @return FunctionSignature|null
+     */
     public function getFunctionSignature(string $functionName): ?FunctionSignature;
+
+    /**
+     * Stores signature in cache
+     *
+     * @param FunctionSignature $signature
+     * @param \ReflectionFunction $reflection
+     * @return void
+     */
     public function storeFunctionSiguature(FunctionSignature $signature, \ReflectionFunction $reflection);
 
-    public function getMethodSignature(string $className, string $methodName): ?MethodSignature;
-    public function storeMethodSignature(MethodSignature $signature, \ReflectionMethod $reflection);
 
+    /**
+     * Gets method signature from cache
+     *
+     * @param string $className
+     * @param string $methodName
+     * @return MethodSignature|null
+     */
+    public function getMethodSignature(string $className, string $methodName): ?MethodSignature;
+
+    /**
+     * Stores method signature in cache
+     * If $reflection is a reflection class, the signature is a void constructor method (class without constructor)
+     *
+     * @param MethodSignature $signature
+     * @param \ReflectionMethod|\ReflectionClass $reflection
+     * @return mixed
+     */
+    public function storeMethodSignature(MethodSignature $signature, $reflection);
+
+
+    /**
+     * Gets the signature of closure
+     *
+     * @param \Closure $closure
+     * @return ClosureSignature|null
+     */
     public function getClosureSignature(\Closure $closure): ?ClosureSignature;
+
+    /**
+     * Stores the signature in cache
+     *
+     * @param ClosureSignature $signature
+     * @param \Closure $closure
+     * @return mixed
+     */
     public function storeClosureSignature(ClosureSignature $signature, \Closure $closure);
 }

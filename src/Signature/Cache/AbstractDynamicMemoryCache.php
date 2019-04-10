@@ -110,7 +110,7 @@ abstract class AbstractDynamicMemoryCache extends AbstractMemoryCache
     /**
      * @inheritDoc
      */
-    public function storeMethodSignature(MethodSignature $signature, \ReflectionMethod $method)
+    public function storeMethodSignature(MethodSignature $signature, $method)
     {
         parent::storeMethodSignature($signature, $method);
         $f = $method->getFileName();

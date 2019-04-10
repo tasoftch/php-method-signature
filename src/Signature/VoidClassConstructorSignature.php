@@ -21,53 +21,15 @@
  * SOFTWARE.
  */
 
-namespace TASoft\PHP\Attribute;
+namespace TASoft\PHP\Signature;
 
 
-class AttributeValue implements \Serializable
+class VoidClassConstructorSignature extends MethodSignature
 {
-    /** @var string */
-    private $name;
-    /** @var string */
-    private $value;
-
-    /**
-     * @return string
-     */
-    public function getName(): ?string
+    public static function makeVoidClass(\ReflectionClass $class): self
     {
-        return $this->name;
-    }
-
-    /**
-     * @return string
-     */
-    public function getValue(): ?string
-    {
-        return $this->value;
-    }
-
-    public function __construct(?string $name, string $value = NULL)
-    {
-        $this->name = $name;
-        $this->value = $value;
-    }
-
-    public function serialize()
-    {
-        return serialize([
-            $this->name,
-            $this->value
-        ]);
-    }
-
-    public function unserialize($serialized)
-    {
-        list($this->name, $this->value) = unserialize($serialized);
-    }
-
-    public function __toString()
-    {
-        return $this->getName();
+        $sig = new static('__construct');
+        $sig->className = $class->getName();
+        return $sig;
     }
 }

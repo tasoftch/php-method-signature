@@ -39,7 +39,7 @@ class FunctionSignature implements \Serializable, \ArrayAccess, \Countable, \Ite
     /**
      * @var array|ArgumentValue[]
      */
-    private $arguments;
+    private $arguments = [];
 
     /** @var null|ReturnValue */
     private $returnValue;

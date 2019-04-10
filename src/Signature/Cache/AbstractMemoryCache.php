@@ -109,7 +109,7 @@ abstract class AbstractMemoryCache implements CacheInterface
     /**
      * @inheritDoc
      */
-    public function storeMethodSignature(MethodSignature $signature, \ReflectionMethod $method)
+    public function storeMethodSignature(MethodSignature $signature, $method)
     {
         $this->methods[sprintf("%s::%s", $signature->getClassName(), $signature->getQualifiedName())] = $signature;
     }

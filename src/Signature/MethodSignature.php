@@ -27,7 +27,7 @@ namespace TASoft\PHP\Signature;
 class MethodSignature extends FunctionSignature
 {
     /** @var string */
-    private $className;
+    protected $className;
 
     /**
      * @return string

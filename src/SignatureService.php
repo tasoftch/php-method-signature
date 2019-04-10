@@ -30,6 +30,7 @@ use TASoft\PHP\Signature\ClosureSignature;
 use TASoft\PHP\Exception\FunctionNotFoundException;
 use TASoft\PHP\Signature\FunctionSignature;
 use TASoft\PHP\Signature\MethodSignature;
+use TASoft\PHP\Signature\VoidClassConstructorSignature;
 
 class SignatureService
 {
@@ -88,6 +89,12 @@ class SignatureService
         $c = $this->getCache();
         if(!$c->getMethodSignature($objectClass, $methodName)) {
             try {
+                if ($methodName == '__construct' && !method_exists($objectClass, '__construct')) {
+                    $class = new \ReflectionClass($objectClass);
+                    $c->storeMethodSignature($sig = VoidClassConstructorSignature::makeVoidClass($class), $class);
+                    return $sig;
+                }
+
                 $refl = new \ReflectionMethod($objectClass, $methodName);
                 $c->storeMethodSignature(
                     MethodSignature::make(
@@ -130,6 +137,12 @@ class SignatureService
             if (function_exists($anything))
                 return $this->getFunctionSignature($anything);
             $anything = explode("::", $anything);
+
+            if (count($anything) == 1) {
+                if (class_exists($anything[0]))
+                    $anything[] = '__construct';
+            }
+
             if (count($anything) == 2) {
                 return $this->getMethodSignature($anything[0], $anything[1]);
             }
@@ -141,8 +154,10 @@ class SignatureService
 
                 return $this->getMethodSignature($class, $anything[1]);
             }
-        } elseif (is_callable($anything)) {
+        } elseif ($anything instanceof \Closure) {
             return $this->getClosureSignature($anything);
+        } elseif (is_object($anything) && method_exists($anything, '__invoke')) {
+            return $this->getMethodSignature(get_class($anything), '__invoke');
         }
 
         return NULL;
