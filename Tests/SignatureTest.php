@@ -206,7 +206,13 @@ class SignatureTest extends TestCase
 
     public function testOptionalSignature()
     {
+        $service = new SignatureService();
+        $sig = $service->getSignature(function (int $argument, string $text, $options = 13) {
+        });
 
+        $this->assertEquals('argument', $sig[0]);
+        $this->assertNull($sig[1]->getDefaultValue());
+        $this->assertEquals(13, $sig[2]->getDefaultValue());
     }
 }
 
