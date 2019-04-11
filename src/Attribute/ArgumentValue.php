@@ -30,6 +30,9 @@ class ArgumentValue extends AttributeValue
     /** @var bool */
     private $isOptional;
 
+    /** @var mixed */
+    private $defaultValue;
+
     /**
      * @return bool
      */
@@ -46,11 +49,12 @@ class ArgumentValue extends AttributeValue
         return $this->isOptional;
     }
 
-    public function __construct(?string $name, string $value = NULL, bool $isOptional = true, bool $allowsNull = true)
+    public function __construct(?string $name, string $value = NULL, bool $isOptional = true, bool $allowsNull = true, $defaultValue = NULL)
     {
         parent::__construct($name, $value);
         $this->isOptional = $isOptional;
         $this->allowsNull = $allowsNull;
+        $this->defaultValue = $defaultValue;
     }
 
     public function serialize()
@@ -58,15 +62,22 @@ class ArgumentValue extends AttributeValue
         return serialize([
             $this->isOptional,
             $this->allowsNull,
+            $this->defaultValue,
             parent::serialize()
         ]);
     }
 
     public function unserialize($serialized)
     {
-        list($this->isOptional, $this->allowsNull, $data) = unserialize($serialized);
+        list($this->isOptional, $this->allowsNull, $this->defaultValue, $data) = unserialize($serialized);
         parent::unserialize($data);
     }
 
-
+    /**
+     * @return mixed
+     */
+    public function getDefaultValue()
+    {
+        return $this->defaultValue;
+    }
 }

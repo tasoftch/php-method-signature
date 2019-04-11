@@ -203,6 +203,11 @@ class SignatureTest extends TestCase
         $this->assertTrue($sig[1]->isOptional());
         $this->assertTrue($sig['flags']->allowsNull());
     }
+
+    public function testOptionalSignature()
+    {
+
+    }
 }
 
 class MySpecialClass

@@ -109,7 +109,12 @@ class FunctionSignature implements \Serializable, \ArrayAccess, \Countable, \Ite
         $sig->returnValue = $getType( $reflection->getReturnType() );
 
         foreach($reflection->getParameters() as $param) {
-            $sig->arguments[ $param->getName() ] = new ArgumentValue($param->getName(), ($t = $param->getType()) ? $t->getName() : NULL, $param->isOptional(), $param->allowsNull());
+            $def = NULL;
+            try {
+                $def = $param->getDefaultValue();
+            } catch (\ReflectionException $exception) {
+            }
+            $sig->arguments[$param->getName()] = new ArgumentValue($param->getName(), ($t = $param->getType()) ? $t->getName() : NULL, $param->isOptional(), $param->allowsNull(), $def);
         }
 
         return $sig;
