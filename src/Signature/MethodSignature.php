@@ -37,12 +37,12 @@ class MethodSignature extends FunctionSignature
         return $this->className;
     }
 
-    public static function make(\ReflectionFunctionAbstract $reflection): FunctionSignature
+    public static function make(\ReflectionFunctionAbstract $reflection, string $originalClass = NULL): FunctionSignature
     {
         /** @var self $sig */
         $sig = parent::make($reflection);
         if($reflection instanceof \ReflectionMethod)
-            $sig->className = $reflection->getDeclaringClass()->getName();
+            $sig->className = $originalClass;
         return $sig;
     }
 

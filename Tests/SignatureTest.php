@@ -36,6 +36,7 @@ use TASoft\PHP\Signature\Cache\LocalMemoryCache;
 use TASoft\PHP\Signature\ClosureSignature;
 use TASoft\PHP\Signature\FunctionSignature;
 use TASoft\PHP\Signature\MethodSignature;
+use TASoft\PHP\Signature\VoidClassConstructorSignature;
 use TASoft\PHP\SignatureService;
 
 
@@ -214,6 +215,29 @@ class SignatureTest extends TestCase
         $this->assertNull($sig[1]->getDefaultValue());
         $this->assertEquals(13, $sig[2]->getDefaultValue());
     }
+
+    public function testSubclassWithoutConstructor()
+    {
+        $service = new SignatureService();
+        $sig = $service->getSignature(MySpecialSubclassWithoutConstructor::class);
+
+        $this->assertInstanceOf(VoidClassConstructorSignature::class, $sig);
+        $this->assertEquals(MySpecialSubclassWithoutConstructor::class, $sig->getClassName());
+        $this->assertEquals("__construct", $sig->getQualifiedName());
+
+        $this->assertCount(0, $sig);
+    }
+
+    public function testSubclassWithConstructor()
+    {
+        $service = new SignatureService();
+        $sig = $service->getSignature(MySpecialSubClass::class);
+
+        $this->assertEquals(MySpecialSubClass::class, $sig->getClassName());
+        $this->assertEquals("__construct", $sig->getQualifiedName());
+
+        $this->assertCount(2, $sig);
+    }
 }
 
 class MySpecialClass
@@ -224,6 +248,17 @@ class MySpecialClass
 }
 
 class MySpecialClassWithoutConstructor
+{
+
+}
+
+
+class MySpecialSubclassWithoutConstructor extends MySpecialClassWithoutConstructor
+{
+}
+
+
+class MySpecialSubClass extends MySpecialClass
 {
 
 }

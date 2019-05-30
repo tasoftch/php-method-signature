@@ -98,7 +98,8 @@ class SignatureService
                 $refl = new \ReflectionMethod($objectClass, $methodName);
                 $c->storeMethodSignature(
                     MethodSignature::make(
-                        $refl
+                        $refl,
+                        $objectClass
                     ),
                     $refl
                 );
