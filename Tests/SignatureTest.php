@@ -81,17 +81,14 @@ class SignatureTest extends TestCase
         $this->assertEquals("arguments", $sig["arguments"]->getName());
     }
 
-    /**
-     * @expectedException \TASoft\PHP\Exception\FunctionNotFoundException
-     */
+
     public function testNonexistingFunction() {
+		$this->expectException(FunctionNotFoundException::class);
         SignatureService::getSignatureService()->getFunctionSignature("unexistingFunction");
     }
-
-    /**
-     * @expectedException \TASoft\PHP\Exception\FunctionNotFoundException
-     */
+	
     public function testNonexistingMethod() {
+		$this->expectException(FunctionNotFoundException::class);
         SignatureService::getSignatureService()->getMethodSignature(self::class, "unexistingFunction");
     }
 
