@@ -55,18 +55,28 @@ class AttributeValue implements \Serializable
 
     public function serialize()
     {
-        return serialize([
-            $this->name,
-            $this->value
-        ]);
+        return serialize($this->__serialize());
     }
 
-    public function unserialize($serialized)
+	public function __serialize(): array
+	{
+		return [
+			$this->name,
+			$this->value
+		];
+	}
+
+	public function unserialize($serialized)
     {
-        list($this->name, $this->value) = unserialize($serialized);
+         $this->__unserialize( unserialize($serialized) );
     }
 
-    public function __toString()
+	public function __unserialize(array $data): void
+	{
+		list($this->name, $this->value) = $data;
+	}
+
+	public function __toString()
     {
         return $this->getName();
     }

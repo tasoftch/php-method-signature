@@ -44,7 +44,7 @@ class FunctionSignature implements \Serializable, \ArrayAccess, \Countable, \Ite
     /** @var null|ReturnValue */
     private $returnValue;
 
-    public function getIterator()
+    public function getIterator(): \Traversable
     {
         return new \ArrayIterator($this->arguments);
     }
@@ -85,19 +85,29 @@ class FunctionSignature implements \Serializable, \ArrayAccess, \Countable, \Ite
 
     public function serialize()
     {
-        return serialize([
-            $this->getQualifiedName(),
-            $this->getArguments(),
-            $this->getReturnValue()
-        ]);
+        return serialize( $this->__serialize() );
     }
 
     public function unserialize($serialized)
     {
-        list($this->qualifiedName, $this->arguments, $this->returnValue) = unserialize($serialized);
+        $this->__unserialize(unserialize($serialized));
     }
 
-    public static function make(\ReflectionFunctionAbstract $reflection): self {
+	public function __serialize(): array
+	{
+		return [
+			$this->getQualifiedName(),
+			$this->getArguments(),
+			$this->getReturnValue()
+		];
+	}
+
+	public function __unserialize(array $data): void
+	{
+		list($this->qualifiedName, $this->arguments, $this->returnValue) =  $data;
+	}
+
+	public static function make(\ReflectionFunctionAbstract $reflection): self {
         $sig = new static( $reflection->getName() );
 
         $getType = function($type) {
@@ -120,7 +130,7 @@ class FunctionSignature implements \Serializable, \ArrayAccess, \Countable, \Ite
         return $sig;
     }
 
-    public function offsetExists($offset)
+    public function offsetExists($offset): bool
     {
         if(is_numeric($offset))
             return $offset>=0 && $offset < count($this->arguments);
@@ -131,7 +141,7 @@ class FunctionSignature implements \Serializable, \ArrayAccess, \Countable, \Ite
      * @param mixed $offset
      * @return ArgumentValue|null
      */
-    public function offsetGet($offset)
+    public function offsetGet($offset): mixed
     {
         if($this->offsetExists($offset)) {
             if(is_numeric($offset))
@@ -141,15 +151,15 @@ class FunctionSignature implements \Serializable, \ArrayAccess, \Countable, \Ite
         return NULL;
     }
 
-    public function offsetSet($offset, $value)
+    public function offsetSet($offset, $value): void
     {
     }
 
-    public function offsetUnset($offset)
+    public function offsetUnset($offset): void
     {
     }
 
-    public function count()
+    public function count(): int
     {
         return count($this->arguments);
     }
