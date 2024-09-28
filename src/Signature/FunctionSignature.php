@@ -122,7 +122,7 @@ class FunctionSignature implements \Serializable, \ArrayAccess, \Countable, \Ite
             $def = NULL;
             try {
                 $def = $param->getDefaultValue();
-            } catch (\ReflectionException $exception) {
+            } catch (\Throwable $exception) {
             }
             $sig->arguments[$param->getName()] = new ArgumentValue($param->getName(), ($t = $param->getType()) ? $t->getName() : NULL, $param->isOptional(), $param->allowsNull(), $def);
         }
