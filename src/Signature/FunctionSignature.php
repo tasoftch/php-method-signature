@@ -141,7 +141,7 @@ class FunctionSignature implements \Serializable, \ArrayAccess, \Countable, \Ite
      * @param mixed $offset
      * @return ArgumentValue|null
      */
-    public function offsetGet($offset): mixed
+    public function offsetGet($offset)
     {
         if($this->offsetExists($offset)) {
             if(is_numeric($offset))
